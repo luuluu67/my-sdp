@@ -1,28 +1,101 @@
-<div class="table-container" id="sgTable"></div>
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shwe Dipar - Gold Purity System</title>
+    <style>
+        :root { --gold: #D4AF37; --bg: #fdfaf1; --dark: #1a1a1a; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); padding: 15px; margin: 0; color: var(--dark); }
+        .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px; }
+        h1 { margin: 0; font-size: 1.8em; color: var(--gold); }
+        .shop-info { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .section-title { background: #fef5d8; padding: 12px; border-radius: 8px; font-weight: bold; margin: 25px 0 10px 0; border-left: 5px solid var(--gold); font-size: 0.95em; }
+        label { display: block; margin-top: 12px; font-weight: bold; font-size: 0.85em; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1em; }
+        .blue-box { background: #eef6ff; padding: 15px; border-radius: 12px; border: 1px solid #cce5ff; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .result-box { margin-top: 15px; padding: 20px; background: #fffdf2; border: 2px dashed var(--gold); border-radius: 12px; text-align: center; font-weight: bold; }
+        button { background: var(--gold); color: white; border: none; padding: 16px; width: 100%; border-radius: 10px; margin-top: 15px; font-size: 1.1em; cursor: pointer; font-weight: bold; }
+        .viber-btn { background: #7360f2; margin-top: 20px; }
+        .table-container { height: 400px; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        th { background: #f8f8f8; position: sticky; top: 0; color: #b8860b; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 5px; }
+        .tab { flex: 1; padding: 12px; font-size: 0.9em; border: 1px solid var(--gold); background: white; cursor: pointer; border-radius: 8px; font-weight: bold; text-align: center; }
+        .tab.active { background: var(--gold); color: white; }
+    </style>
+</head>
+<body>
 
-    <a href="javascript:void(0)" onclick="openViber()" class="viber-btn">Viber မှ မေးမြန်းရန်</a>
+<div class="container">
+    <div class="header">
+        <h1>ရွှေဒီပါ (Shwe Dipar)</h1>
+        <div class="shop-info">ပန်းထိမ်နှင့် စိန်ရွှေရတနာ - ရွှေရည်စစ်ဆေးရေးစနစ်</div>
+    </div>
+
+    <div class="section-title">⚖️ Gram ⇌ မြန်မာရွှေချိန်</div>
+    <div class="blue-box">
+        <label>ဂရမ် (Gram) ရိုက်ထည့်ပါ</label>
+        <input type="number" id="inGram" placeholder="ဥပမာ - 16.606" oninput="gToM()">
+        <div id="gRes" style="margin-top: 12px; color: #0056b3; font-weight: bold; font-size: 1.1em;"></div>
+    </div>
+
+    <div class="section-title">✨ ရွှေဈေးတွက်စက်</div>
+    <label>ယနေ့ အခေါက်ရွှေဈေး (ကျပ်)</label>
+    <input type="number" id="mPrice" value="5000000">
+    
+    <label>ရွှေရည် (အစဉ်လိုက်)</label>
+    <select id="pur">
+        <option value="16">၁၆ ပဲရည် (24K)</option>
+        <option value="15.125">၁၅ ပဲ ၂ ပြား (22.6K)</option>
+        <option value="15" selected>၁၅ ပဲရည် (22.5K)</option>
+        <option value="14">၁၄ ပဲရည် (21K)</option>
+        <option value="13">၁၃ ပဲရည် (19.5K)</option>
+        <option value="12">၁၂ ပဲရည် (18K)</option>
+    </select>
+
+    <label>အလေးချိန် (ကျပ်/ပဲ/ရွေး/ပွိုင့်)</label>
+    <div class="grid-4">
+        <input type="number" id="k" placeholder="ကျပ်">
+        <input type="number" id="p" placeholder="ပဲ">
+        <input type="number" id="y" placeholder="ရွေး">
+        <input type="number" id="pt" placeholder="ပွိုင့်">
+    </div>
+    <button onclick="calc()">ဈေးနှုန်းတွက်ချက်မည်</button>
+    <div id="res" class="result-box">ရွှေသားတန်ဖိုး တွက်ချက်ပေးမည်</div>
+
+    <div class="section-title">📊 SG ဇယား (အထည်သစ် နှင့် အထည်ပျက်)</div>
+    <div class="tabs">
+        <div class="tab active" onclick="loadTab('new', this)">အထည်သစ်</div>
+        <div class="tab" onclick="loadTab('old', this)">အထည်ပျက်</div>
+    </div>
+    <div class="table-container" id="sgTable"></div>
+
+    <button class="viber-btn" onclick="viber()">Viber မှ မေးမြန်းရန်</button>
 </div>
 
 <script>
 const sgData = {
-    new: [{s:18.0795, p:"15"}, {s:17.9356, p:"14.7"}, {s:17.7939, p:"14.6"}, {s:17.6544, p:"14.5"}, {s:17.5172, p:"14.4"}, {s:17.3820, p:"14.3"}, {s:17.2489, p:"14.2"}, {s:17.1178, p:"14.1"}, {s:16.9887, p:"14"}, {s:16.8616, p:"13.7"}, {s:16.7363, p:"13.6"}, {s:16.6129, p:"13.5"}, {s:16.4913, p:"13.4"}, {s:16.3714, p:"13.3"}, {s:16.2533, p:"13.2"}, {s:16.1369, p:"13.1"}, {s:16.0221, p:"13"}, {s:15.1595, p:"12"}],
+    new: [{s:18.0795, p:"15"}, {s:17.9356, p:"14.7"}, {s:17.7939, p:"14.6"}, {s:17.6544, p:"14.5"}, {s:17.5172, p:"14.4"}, {s:17.3820, p:"14.3"}, {s:17.2489, p:"14.2"}, {s:17.1178, p:"14.1"}, {s:16.9887, p:"14"}, {s:16.8616, p:"13.7"}, {s:16.7363, p:"13.6"}, {s:16.6129, p:"13.5"}, {s:16.4913, p:"13.4"}, {s:16.3714, p:"13.3"}, {s:16.2533, p:"13.2"}, {s:16.1369, p:"13.1"}, {s:16.0221, p:"13"}, {s:15.1595, p:"12"}, {s:14.3851, p:"11"}],
     old: [{s:18.0486, p:"15"}, {s:17.9013, p:"14.7"}, {s:17.7565, p:"14.6"}, {s:17.6139, p:"14.5"}, {s:17.4737, p:"14.4"}, {s:17.3356, p:"14.3"}, {s:17.1997, p:"14.2"}, {s:17.0659, p:"14.1"}, {s:16.9342, p:"14"}, {s:15.9495, p:"13"}, {s:15.0729, p:"12"}]
 };
 
 function loadTab(type, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
-    let html = <table><tr><th>SG</th><th>ရွှေရည် (ပဲ.ရွေး)</th></tr>;
-    sgData[type].forEach(i => { html += <tr><td>${i.s.toFixed(4)}</td><td>${i.p}</td></tr>; });
+    let html = `<table><tr><th>SG (သိပ်သည်းဆ)</th><th>ရွှေရည် (ပဲ.ရွေး)</th></tr>`;
+    sgData[type].forEach(i => { html += `<tr><td>${i.s.toFixed(4)}</td><td>${i.p}</td></tr>`; });
     document.getElementById('sgTable').innerHTML = html + "</table>";
 }
 
 function gToM() {
     let g = parseFloat(document.getElementById('inGram').value) || 0;
-    if(g==0) { document.getElementById('gRes').innerText=""; return; }
     let tk = g/16.606;
     let k=Math.floor(tk), p=Math.floor((tk-k)*16), y=Math.floor(((tk-k)*16-p)*8), pt=Math.round((((tk-k)*16-p)*8-y)*10);
-    document.getElementById('gRes').innerText = ရလဒ်: ${k} ကျပ် ${p} ပဲ ${y} ရွေး ${pt} ပွိုင့်;
+    document.getElementById('gRes').innerText = g > 0 ? `ရလဒ်: ${k} ကျပ် ${p} ပဲ ${y} ရွေး ${pt} ပွိုင့်` : "";
 }
 
 function calc() {
@@ -30,14 +103,10 @@ function calc() {
     let ky = parseFloat(document.getElementById('k').value)||0, pa = parseFloat(document.getElementById('p').value)||0, yw = parseFloat(document.getElementById('y').value)||0, po = parseFloat(document.getElementById('pt').value)||0;
     let totalK = ky + (pa/16) + (yw/128) + (po/1280);
     let total = Math.round(totalK * (mp/16) * pr);
-    document.getElementById('res').innerHTML = <span style="font-size:1.3em; color:var(--gold);">${total.toLocaleString()} ကျပ်</span>;
+    document.getElementById('res').innerHTML = `<span style="font-size:1.4em; color:var(--gold);">${total.toLocaleString()} ကျပ်</span>`;
 }
 
-function openViber() {
-    // 959784243970 နေရာတွင် မင်း၏ ဖုန်းနံပါတ်အမှန်ကို ထည့်ပါ
-    window.open("https://msng.link/o/?959784243970=vi", "_blank");
-}
-
+function viber() { window.location.href = "viber://chat?number=959784243970"; }
 loadTab('new', document.querySelector('.tab'));
 </script>
 </body>
